@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LangGraph Code Generator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="header">LangGraph Code Generator</div>
+    <div class="container">
+        <form id="codeForm">
+            <label for="prompt">Code Generation Prompt:</label>
+            <textarea id="prompt" name="prompt" rows="3" required placeholder="Describe the code you want..."></textarea>
+            <label for="requirements">Additional Requirements:</label>
+            <input id="requirements" name="requirements" type="text" placeholder="(Optional)">
+            <button type="submit">Generate Code</button>
+        </form>
+        <div id="result" class="result" style="display:none;"></div>
+        <div id="error" class="error" style="display:none;"></div>
+    </div>
+    <script>
+    document.getElementById('codeForm').onsubmit = async function(e) {
+        e.preventDefault();
+        document.getElementById('result').style.display = 'none';
+        document.getElementById('error').style.display = 'none';
+        const prompt = document.getElementById('prompt').value;
+        const requirements = document.getElementById('requirements').value;
+        const formData = new FormData();
+        formData.append('prompt', prompt);
+        formData.append('requirements', requirements);
+        const response = await fetch('/generate', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await response.json();
+        if (data.success) {
+            document.getElementById('result').textContent = data.generated_code || data.final_result;
+            document.getElementById('result').style.display = 'block';
+        } else {
+            document.getElementById('error').textContent = data.error || data.final_result || 'Error generating code.';
+            document.getElementById('error').style.display = 'block';
+        }
+    };
+    </script>
+</body>
+</html>
